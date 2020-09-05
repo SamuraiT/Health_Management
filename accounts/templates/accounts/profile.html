@@ -1,0 +1,41 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+
+<div class="card card-profile my-5 mx-auto">
+    <div class="card-body">
+        <h5 class="card-title text-center">Profile</h5>
+        <table class="profile_table mb-4">
+            <tbody>
+                <tr>
+                    <th class="header">Name</th>
+                    <td class="data">{{ user_data.first_name }} {{ user_data.last_name }}</td>
+                </tr>
+                <tr>
+                    <th class="header">Email address</th>
+                    <td class="data">{{ user_data.email }}</td>
+                </tr>
+                <tr>
+                    <th class="header">Age</th>
+                    <td class="data">{{ user_data.age }}</td>
+                </tr>
+                <tr>
+                    <th class="header">Height</th>
+                    <td class="data">{{ user_data.height }}</td>
+                </tr>
+                <tr>
+                    <th class="header">Target Weight</th>
+                    <td class="data">{{ user_data.weight }}</td>
+                </tr>
+                <tr>
+                    <th class="header">Start Date</th>
+                    <td class="data">{{ user_data.created }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="button mx-auto"></div>
+        <a href="{% url 'profile_edit' %}" class="btn btn-lg btn-warning btn-block">EDIT</a>
+    </div>
+</div>
+
+{% endblock %}
