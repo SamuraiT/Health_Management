@@ -20,7 +20,7 @@ import io
 def homeview(request):
     YEAR = datetime.datetime.now().strftime("%Y")
     MONTH= datetime.datetime.now().strftime("%B")
-    object_list = HealthApp.objects.all().order_by('postdate')
+    object_list = request.user.healthapp_set.all().order_by('postdate')
     context = {
         'year':YEAR,
         'month':MONTH,
@@ -33,7 +33,9 @@ def homeview(request):
 def create(request):
     form = PostForm(request.POST)
     if form.is_valid():
-        form.save(commit=True)
+        helathapp = form.save(commit=True)
+        helathapp.user = request.user
+        helathapp.save()
     return HttpResponseRedirect(reverse('home'))
 
 def delete(request, id=None):
