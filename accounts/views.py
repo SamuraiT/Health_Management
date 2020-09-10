@@ -4,9 +4,7 @@ from accounts.models import CustomUser
 from accounts.forms import ProfileForm
 from allauth.account import views
 from accounts.forms import ProfileForm, SignupUserForm
-from django.contrib.auth.mixins import LoginRequiredMixin 
-
-# Create your views here.
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 class ProfileView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):

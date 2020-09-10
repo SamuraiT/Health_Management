@@ -6,6 +6,9 @@
 <div class="card card-auth my-5 mx-auto">
     <div class="card-body">
         <h5 class="card-title text-center">Sign Up</h5>
+        {% if error %}
+        {{ error }}
+        {% endif %}
         <form method="post" class="form-auth">
             {% csrf_token %}
             <div class="form-label-group form_wrap form_wrap-2">
@@ -15,6 +18,7 @@
             <div class="form-label-group">
                 {% render_field form.email class="form-control" placeholder="Email address" %}
             </div>
+            <!--
             <div class="form-label-group">
                 {% render_field form.age class="form-control" placeholder="Age" %}
             </div>
@@ -24,6 +28,7 @@
             <div class="form-label-group">
                 {% render_field form.weight class="form-control" placeholder="Target Weight" %}
             </div>
+            -->
             <div class="form-label-group">
                 {% render_field form.password1 class="form-control" placeholder="Password" %}
             </div>

@@ -5,81 +5,87 @@
 <!-- Header -->
 <div class="container">
     <div class="row header">
-    <div class="col-md">
-        <h1>MY PAGE</h1>
-    </div>
+        <div class="col-md">
+            <h1>MY PAGE</h1>
+        </div>
     </div>
 
     <!-- Top -->
     <div class="row top h-auto">
         <div class="col-md">{{ month }} {{ year }} </div>
+        <a href="#">
+            <h4> << {{ prev_month }}</h4>
+        </a>
+        <a href="#">
+            <h4> {{ next_month }} >></h4>
+        </a>
     </div>
 
     <div class="row-inner">
-    <!-- Input Form -->
-    <div class="form">
-        <h2>Please Enter</h2>
-        <form action="{% url 'create' %}" method="POST" autocomplete="off">
-            {% csrf_token %}
-            <div class="form-row">
-                {{ Input }}
-                <button type="submit" class="btn btn-primary">Create</button>
+        <!-- Input Form -->
+        <div class="form">
+            <h2>Please Enter</h2>
+            <form action="{% url 'create' %}" method="POST" autocomplete="off">
                 {% csrf_token %}
+                <div class="form-row">
+                    {{ Input }}
+                    <button type="submit" class="btn btn-primary">Create</button>
+                    {% csrf_token %}
+                </div>
+            </form>
+        </div>
+    
+        <!-- Tab -->
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+            <a href="#tab1" class="nav-link active" data-toggle="tab">MY DATA</a>
+            </li>
+            <li class="nav-item">
+            <a href="#tab2" class="nav-link" data-toggle="tab">GRAPH</a>
+            </li>
+        </ul>
+    
+        <!-- Tab content -->
+        <div class="tab-content">
+            <div id="tab1" class="tab-pane active">
+            <table class="table">
+                <thead>
+                <tr class="table_scope">
+                    <th class="date" scope="col">Date</th>
+                    <th class="weight" scope="col">Weight</th>
+                    <th class="steps" scope="col">Steps</th>
+                    <th class="exercise" scope="col">Exercise</th>
+                    <th class="notes" scope="col">Notes</th>
+                    <th class="edit" scope="col">Del</th>
+                </tr>
+                </thead>
+
+                <tbody>
+            {% for item in object_list reversed %}
+            {% csrf_token %}
+                <tr class="table_data">
+                    <th class="date" scope="row">{{item.postdate}}</th>
+                    <td class="weight">{{item.weight}} kg</td>
+                    <td class="steps">{{item.steps}} steps</td>
+                    <td class="exercise">{{item.exercise}}</td>
+                    <td class="notes">{{item.notes}}</td>
+                    <td class="edit"> 
+                    <form action="{% url 'delete' item.id %}" method="post">
+                        {% csrf_token %}
+                        <button class="btn btn-danger" type="submit" name="delete">Del</button>
+                        {% csrf_token %}
+                    </form>
+                    </td>
+                </tr>
+            {% endfor %}
+                </tbody>
+            </table>
             </div>
-        </form>
-    </div>
-    
-    <!-- Tab -->
-    <ul class="nav nav-tabs">
-        <li class="nav-item">
-        <a href="#tab1" class="nav-link active" data-toggle="tab">MY DATA</a>
-        </li>
-        <li class="nav-item">
-        <a href="#tab2" class="nav-link" data-toggle="tab">GRAPH</a>
-        </li>
-    </ul>
-    
-    <!-- Tab content -->
-    <div class="tab-content">
-        <div id="tab1" class="tab-pane active">
-        <table class="table">
-            <thead>
-            <tr class="table_scope">
-                <th class="date" scope="col">Date</th>
-                <th class="weight" scope="col">Weight</th>
-                <th class="steps" scope="col">Steps</th>
-                <th class="exercise" scope="col">Exercise</th>
-                <th class="notes" scope="col">Notes</th>
-                <th class="edit" scope="col">Del</th>
-            </tr>
-            </thead>
 
-            <tbody>
-        {% for item in object_list reversed %}
-        {% csrf_token %}
-            <tr class="table_data">
-                <th class="date" scope="row">{{item.postdate}}</th>
-                <td class="weight">{{item.weight}} kg</td>
-                <td class="steps">{{item.steps}} steps</td>
-                <td class="exercise">{{item.exercise}}</td>
-                <td class="notes">{{item.notes}}</td>
-                <td class="edit"> 
-                <form action="{% url 'delete' item.id %}" method="post">
-                    {% csrf_token %}
-                    <button class="btn btn-danger" type="submit" name="delete">Del</button>
-                    {% csrf_token %}
-                </form>
-                </td>
-            </tr>
-        {% endfor %}
-            </tbody>
-        </table>
-        </div>
-
-        <!-- Tab graph -->
-        <div id="tab2" class="tab-pane" style="text-align:center;">
-        <img src="{% url 'plot' %}" alt="graph">
-        </div>
+            <!-- Tab graph -->
+            <div id="tab2" class="tab-pane" style="text-align:center;">
+            <img src="{% url 'plot' %}" alt="graph">
+            </div>
 
     </div>
     </div>

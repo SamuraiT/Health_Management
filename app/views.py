@@ -9,6 +9,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.utils import timezone
 import datetime
 from .forms import PostForm, InputForm
+from dateutil.relativedelta import relativedelta
 
 # グラフ表示用
 import matplotlib
@@ -16,24 +17,52 @@ import matplotlib.pyplot as plt
 import io
 
 
+today = datetime.datetime.now()
+year = today.strftime("%Y")
+month = today.strftime("%B")
+
+def get_next(year, month):
+    year = int(today.strftime("%Y")) + 1
+    month = (today + relativedelta(months=1)).strftime("%b")
+    if month == "January":
+        return int(year) + 1, month
+    else:
+        return year, month
+
+
+def get_prev(year, month):
+    year = int(today.strftime("%Y")) - 1
+    month = (today + relativedelta(months=-1)).strftime("%b")
+    if month == "January":
+        return int(year) - 1, month
+    else:
+        return str(year), month
+
+
 @login_required
 def homeview(request):
-    YEAR = datetime.datetime.now().strftime("%Y")
-    MONTH= datetime.datetime.now().strftime("%B")
-    object_list = HealthApp.objects.all().order_by('postdate')
+    next_year, next_month = get_next(year, month)
+    prev_year, prev_month = get_prev(year, month)
+    object_list = request.user.healthapp_set.all().order_by('postdate')
     context = {
-        'year':YEAR,
-        'month':MONTH,
+        'year':year,
+        'month':month,
+        'next_year':next_year,
+        'next_month':next_month,
+        'prev_year':prev_year,
+        'prev_month':prev_month,
         'object_list':object_list, 
         'Input':InputForm(),
         }
-
+    
     return render(request, 'app/home.html', context)
 
 def create(request):
     form = PostForm(request.POST)
     if form.is_valid():
-        form.save(commit=True)
+        healthapp = form.save(commit=True)
+        healthapp.user = request.user
+        healthapp.save()
     return HttpResponseRedirect(reverse('home'))
 
 def delete(request, id=None):
@@ -47,8 +76,8 @@ def delete(request, id=None):
 matplotlib.use('Agg')
 
 #グラフ作成
-def setPlt():
-    lists = HealthApp.objects.all().order_by('postdate')
+def setPlt(request):
+    lists = request.user.healthapp_set.all().order_by('postdate')
     weight = [float(data.weight) for data in lists]
     steps = [int(data.steps) for data in lists]
     postdates = [str(data.postdate) for data in lists]
@@ -56,9 +85,6 @@ def setPlt():
     date = []
     for dates in sorted(postdates):
         day = str(dates.split("-")[2])
-        #month = str(dates.split("-")[1])
-        #postdate = month + "/" + day
-        #date.append(postdate)
         date.append(day)
     
     fig, ax1 = plt.subplots()
@@ -91,12 +117,11 @@ def plt2svg():
 
 # 実行するビュー関数
 def get_svg(request):
-    setPlt()  
+    setPlt(request)  
     svg = plt2svg()  #SVG化
     plt.cla()  # グラフをリセット
     response = HttpResponse(svg, content_type='image/svg+xml')
     return response
-
 
 
 
