@@ -19,42 +19,46 @@ import io
 
 today = datetime.datetime.now()
 year = today.strftime("%Y")
-month = today.strftime("%B")
+month = today.strftime("%B")         #英語表記         
+current_month = today.strftime("%m") #数字表記
+
 
 def get_next(year, month):
-    year = int(today.strftime("%Y")) + 1
-    month = (today + relativedelta(months=1)).strftime("%b")
-    if month == "January":
-        return int(year) + 1, month
+    year = int(year)
+    month = int(month)
+    if month == "Jan":
+        return int(year) +1, month
     else:
-        return year, month
+        return year, int(month) +1
 
 
 def get_prev(year, month):
-    year = int(today.strftime("%Y")) - 1
-    month = (today + relativedelta(months=-1)).strftime("%b")
-    if month == "January":
-        return int(year) - 1, month
+    year = int(year)
+    month = int(month)
+    if month == "Jan":
+        return int(year) -1, month
     else:
-        return str(year), month
+        return year, int(month) -1 
 
 
 @login_required
-def homeview(request):
+def homeview(request, year, month):
     next_year, next_month = get_next(year, month)
     prev_year, prev_month = get_prev(year, month)
-    object_list = request.user.healthapp_set.all().order_by('postdate')
+    object_list = request.user.healthapp_set.all().order_by('postdate').filter(
+        postdate__month = month,
+        postdate__year = year)
     context = {
         'year':year,
         'month':month,
-        'next_year':next_year,
         'next_month':next_month,
-        'prev_year':prev_year,
+        'next_year':next_year,
         'prev_month':prev_month,
+        'prev_year':prev_year,
         'object_list':object_list, 
         'Input':InputForm(),
         }
-    
+
     return render(request, 'app/home.html', context)
 
 def create(request):
@@ -77,7 +81,8 @@ matplotlib.use('Agg')
 
 #グラフ作成
 def setPlt(request):
-    lists = request.user.healthapp_set.all().order_by('postdate')
+#    lists = request.user.healthapp_set.all().order_by('postdate').filter(postdate__month = current_month)
+    lists = request.user.healthapp_set.all().order_by('postdate').filter(postdate__month = month)
     weight = [float(data.weight) for data in lists]
     steps = [int(data.steps) for data in lists]
     postdates = [str(data.postdate) for data in lists]
@@ -122,7 +127,6 @@ def get_svg(request):
     plt.cla()  # グラフをリセット
     response = HttpResponse(svg, content_type='image/svg+xml')
     return response
-
 
 
 
