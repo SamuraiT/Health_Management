@@ -42,7 +42,7 @@ def get_prev(year, month):
 
 
 @login_required
-def homeview(request, year, month):
+def homeview(request, year=year, month=current_month):
     next_year, next_month = get_next(year, month)
     prev_year, prev_month = get_prev(year, month)
     object_list = request.user.healthapp_set.all().order_by('postdate').filter(
